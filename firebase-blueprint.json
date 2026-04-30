@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "MenuItem": {
+      "title": "Menu Item",
+      "description": "A dish or drink on the menu",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "isFasting": { "type": "boolean" }
+      },
+      "required": ["name", "description", "price", "category"]
+    },
+    "RestaurantInfo": {
+      "title": "Restaurant Info",
+      "description": "General settings and contact info for the restaurant",
+      "type": "object",
+      "properties": {
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "phone": { "type": "string" },
+        "hours": { "type": "string" }
+      },
+      "required": ["address", "city", "phone", "hours"]
+    }
+  },
+  "firestore": {
+    "menu": {
+      "schema": "MenuItem",
+      "description": "Collection of all menu items"
+    },
+    "settings/restaurant": {
+      "schema": "RestaurantInfo",
+      "description": "Single document containing restaurant contact and hours"
+    }
+  }
+}

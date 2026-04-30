@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Menu Items
+    match /menu/{itemId} {
+      // Publicly readable
+      allow list: if true;
+      allow get: if true;
+      
+      // Allow creation for anyone for initial seeding, but validate schema
+      allow create: if isValidMenuItem(incoming());
+      
+      // Only signed-in users can update or delete
+      allow update, delete: if isSignedIn();
+    }
+
+    // Settings
+    match /settings/restaurant {
+      allow get: if true;
+      // Allow creation if it doesn't exist, but only update if signed in
+      allow create: if isValidRestaurantInfo(incoming());
+      allow update: if isSignedIn() && isValidRestaurantInfo(incoming());
+    }
+
+    function isValidMenuItem(data) {
+      return data.keys().hasAll(['name', 'description', 'price', 'category'])
+        && data.keys().size() >= 4
+        && data.name is string && data.name.size() > 0 && data.name.size() < 100
+        && data.description is string && data.description.size() < 500
+        && data.price is number && data.price >= 0
+        && data.category is string;
+    }
+
+    function isValidRestaurantInfo(data) {
+      return data.keys().hasAll(['address', 'city', 'phone', 'hours'])
+        && data.keys().size() == 4
+        && data.address is string
+        && data.city is string
+        && data.phone is string
+        && data.hours is string;
+    }
+  }
+}
