@@ -72,6 +72,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 export default function App() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFastingOnly, setShowFastingOnly] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -265,6 +266,37 @@ export default function App() {
       setIsLoading(false);
     }
   };
+
+  if (showIntro) {
+    return (
+      <motion.div 
+        initial={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1 }}
+        className="fixed inset-0 z-[200] bg-black flex items-center justify-center overflow-hidden"
+      >
+        <div className="relative w-full max-w-5xl aspect-video px-4">
+          <video 
+            autoPlay 
+            muted
+            playsInline
+            onEnded={() => setShowIntro(false)}
+            className="w-full h-full object-contain rounded-2xl shadow-2xl shadow-brand-accent/20"
+          >
+            <source src="https://cdn.imageurlgenerator.com/uploads/b1501913-68ed-4eca-a401-cb4cadb71521.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <button 
+          onClick={() => setShowIntro(false)}
+          className="absolute bottom-10 right-10 flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-full text-sm font-bold border border-white/20 transition-all active:scale-95 group"
+        >
+          Skip Intro
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </motion.div>
+    );
+  }
 
   if (isLoading && menuItems.length === 0) {
     return (
