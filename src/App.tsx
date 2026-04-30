@@ -13,7 +13,8 @@ import {
   Check,
   Loader2,
   RefreshCcw,
-  ArrowRight
+  ArrowRight,
+  Menu
 } from 'lucide-react';
 import { 
   collection, 
@@ -73,6 +74,7 @@ export default function App() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showIntro, setShowIntro] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFastingOnly, setShowFastingOnly] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -289,10 +291,10 @@ export default function App() {
         </div>
         <button 
           onClick={() => setShowIntro(false)}
-          className="absolute bottom-10 right-10 flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-full text-sm font-bold border border-white/20 transition-all active:scale-95 group"
+          className="absolute bottom-10 right-10 flex items-center gap-2 bg-brand-accent text-white px-8 py-4 rounded-full text-base font-bold shadow-2xl transition-all active:scale-95 group z-[10]"
         >
           Skip Intro
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </motion.div>
     );
@@ -315,36 +317,37 @@ export default function App() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-brand-primary text-white p-2 rounded-2xl shadow-2xl flex items-center gap-2 border-2 border-brand-accent/50 backdrop-blur-xl"
+            className="fixed bottom-6 md:bottom-8 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[100] bg-brand-primary text-white p-2 rounded-2xl shadow-2xl flex items-center gap-1 md:gap-2 border-2 border-brand-accent/50 backdrop-blur-xl"
           >
-            <div className="flex flex-col px-4 py-1 border-r border-white/10 mr-1">
+            <div className="hidden sm:flex flex-col px-4 py-1 border-r border-white/10 mr-1">
               <span className="text-[10px] font-bold text-brand-accent uppercase tracking-widest">Admin Access</span>
-              <span className="text-xs font-semibold opacity-80">Management Mode</span>
+              <span className="text-xs font-semibold opacity-80 whitespace-nowrap">Management Mode</span>
             </div>
             
             <button 
               onClick={() => setShowAddModal(true)}
-              className="bg-brand-accent hover:bg-brand-accent/90 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95"
+              className="flex-1 md:flex-none bg-brand-accent hover:bg-brand-accent/90 text-white px-4 md:px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
             >
-              <Plus className="w-4 h-4" /> Add Dish
+              <Plus className="w-4 h-4" /> <span className="hidden xs:inline">Add Dish</span>
             </button>
             <button 
               onClick={() => setShowInfoModal(true)}
-              className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 border border-white/5"
+              className="flex-1 md:flex-none bg-white/10 hover:bg-white/20 text-white px-4 md:px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 border border-white/5"
             >
-              <Edit2 className="w-4 h-4 text-brand-accent" /> Edit Info
+              <Edit2 className="w-4 h-4 text-brand-accent" /> <span className="hidden xs:inline">Edit Info</span>
             </button>
             <button 
               onClick={handleResetMenu}
-              className="bg-white/10 hover:bg-red-500/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 border border-white/5 hover:text-red-400 group"
+              className="bg-white/10 hover:bg-red-500/20 text-white p-2.5 md:px-5 md:py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 border border-white/5 hover:text-red-400 group"
               title="Restores menu items to default list"
             >
-              <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" /> Reset Menu
+              <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" /> 
+              <span className="hidden md:inline">Reset Menu</span>
             </button>
             
             <button 
                 onClick={() => setIsAdmin(false)}
-                className="p-2 ml-2 text-white/50 hover:text-red-400 transition-colors"
+                className="p-2 ml-1 md:ml-2 text-white/50 hover:text-red-400 transition-colors"
                 title="Exit Admin Mode"
             >
                 <X className="w-5 h-5" />
@@ -398,8 +401,48 @@ export default function App() {
             >
               <Settings className={`w-5 h-5 ${isAdmin ? 'rotate-90' : ''} transition-transform`} />
             </button>
+
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2.5 rounded-full bg-brand-primary text-white"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white border-t border-stone-100 overflow-hidden"
+            >
+              <div className="flex flex-col p-6 gap-4 text-sm font-bold uppercase tracking-widest text-brand-primary">
+                <a 
+                  href="#menu" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-brand-accent transition-colors py-2"
+                >
+                  Menu
+                </a>
+                <a 
+                  href="#contact" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-brand-accent transition-colors py-2"
+                >
+                  Contact
+                </a>
+                <div className="pt-4 border-t border-stone-100 flex items-center gap-3 text-stone-500 lowercase">
+                  <Clock className="w-4 h-4 text-brand-accent" />
+                  <span>{restaurantInfo.hours}</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero Section */}
@@ -762,7 +805,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({
 
 function Modal({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-6">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -771,13 +814,13 @@ function Modal({ children, onClose, title }: { children: React.ReactNode; onClos
         onClick={onClose} 
       />
       <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="relative bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden"
       >
-        <div className="p-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-serif font-bold text-brand-primary italic">{title}</h2>
+        <div className="p-6 sm:p-8">
+          <div className="flex justify-between items-center mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-serif font-bold text-brand-primary italic">{title}</h2>
             <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-full transition-all">
               <X className="w-6 h-6 text-stone-400" />
             </button>
